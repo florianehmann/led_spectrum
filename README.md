@@ -3,6 +3,11 @@ LED Spectrum
 
 Arduino Sketch for LED Matrix based Audio Visualizer.
 
+Hardware
+--------
+
+Currently the code is designed to run on an ATmega328P MCU. Some of the hardware-specific features, like timers are used.
+
 Copyright
 ---------
 
