@@ -13,14 +13,20 @@
 #include "led_spectrum.h"
 #include "goertzel.h"
 
+// array of pointers to the filters
 goertzel_t *filters[NUMBER_OF_BINS];
 
-void init_filters() {
+// filters are done
+bool filters_done = false;
+
+void alloc_filters() {
   // allocate memory for filters
   for (int i = 0; i < NUMBER_OF_BINS; i++) {
     filters[i] = (goertzel_t *) malloc(sizeof(goertzel_t));
   }
+}
 
+void init_filters() {
   // calculate the factor q between two frequency bins in the relation
   // f_n = f_(n-1) * q, when n is the number of the bin
   float q = pow(((float) MAX_FREQ) / MIN_FREQ, 1.0 / (NUMBER_OF_BINS - 1));
@@ -35,10 +41,10 @@ void init_filters() {
     float normalized_bin_frequency = TWO_PI * bin_frequency / SAMPLE_FREQ;
 
     // TODO calculate the number of samples to match the constant Q
-    uint16_t number_of_samples = 100;
+    uint16_t number_of_samples = 50;
 
     // call constructor
-    goertzel_init(filters[NUMBER_OF_BINS - i], normalized_bin_frequency,
+    goertzel_init(filters[NUMBER_OF_BINS - i - 1], normalized_bin_frequency,
                   number_of_samples);
   }
 }
@@ -47,29 +53,49 @@ void setup() {
   // Serial connection for debugging output
   Serial.begin(115200);
 
+  // init goertzel filters
+  alloc_filters();
+  init_filters();
+
   // init timer for data acquisition
   init_timer();
-
-  // init goertzel filters
-  init_filters();
 }
 
 void loop() {
-  // time of last matrix refresh
-  static unsigned long last_matrix_update = millis();
+  // do something, when filters are done
+  if (filters_done) {
+    // output spectrum
+    for (int i = 0; i < NUMBER_OF_BINS; i++) {
+      Serial.println(goertzel_get_magnitude(filters[i]));
+    }
 
-  // current time
-  unsigned long current_time = millis();
-
-  // task timing
-  if (current_time - last_matrix_update > MATRIX_PERIOD) {
-    update_matrix();
-    last_matrix_update = current_time;
+    // request new samples
+    init_filters();
+    filters_done = false;
+    enable_timer();
   }
 }
 
-inline void acquire_sample() {
-  float sample = analogRead(A0);
+inline float acquire_sample() {
+  return analogRead(A0);
+}
+
+inline void feed_filters(float sample) {
+  // iterate over filters
+  for (int i = 0; i < NUMBER_OF_BINS; i++) {
+    goertzel_feed_sample(filters[i], sample);
+  }
+}
+
+inline bool check_filters() {
+  // iterate over filters, if one is not done, more samples are needed
+  bool filters_done = true;
+  for (int i = 0; i < NUMBER_OF_BINS; i++) {
+    if (filters[i]->processed_samples < filters[i]->max_samples)
+      filters_done = false;
+  }
+
+  return filters_done;
 }
 
 void update_matrix() {}
@@ -94,10 +120,29 @@ ISR(TIMER2_COMPA_vect) {
   uint8_t old_SREG = SREG;
   cli();
 
-  // perform action
-  acquire_sample();
+  // acquire sample data from adc
+  float sample = acquire_sample();
+
+  // process sample
+  feed_filters(sample);
+
+  // check if filters are done
+  filters_done = check_filters();
+  if (filters_done) {
+    disable_timer();
+  }
 
   // restore status register
   SREG = old_SREG;
+}
+
+void disable_timer() {
+  // disable output compare interrupt A
+  TIMSK2 &= ~(1 << OCIE2A);
+}
+
+void enable_timer() {
+  // enable output compare interrupt A
+  TIMSK2 |= (1 << OCIE2A);
 }
 
