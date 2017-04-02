@@ -18,7 +18,10 @@
 // desired maximum frequency in the spectrum in Hz
 // the current prescaling of the counter does only allow
 // values between 20 kHz and 1954 Hz
-const unsigned int MAX_FREQ = 5000;
+const unsigned int MAX_FREQ = 2500;
+
+// desired minimum frequency in the spectrum in Hz
+const unsigned int MIN_FREQ = 20;
 
 // number of frequency bins of the output, e.g. 8 for an 8x8 matrix
 const uint8_t NUMBER_OF_BINS = 8;

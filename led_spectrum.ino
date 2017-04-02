@@ -11,6 +11,37 @@
 */
 
 #include "led_spectrum.h"
+#include "goertzel.h"
+
+goertzel_t *filters[NUMBER_OF_BINS];
+
+void init_filters() {
+  // allocate memory for filters
+  for (int i = 0; i < NUMBER_OF_BINS; i++) {
+    filters[i] = (goertzel_t *) malloc(sizeof(goertzel_t));
+  }
+
+  // calculate the factor q between two frequency bins in the relation
+  // f_n = f_(n-1) * q, when n is the number of the bin
+  float q = pow(((float) MAX_FREQ) / MIN_FREQ, 1.0 / (NUMBER_OF_BINS - 1));
+
+  // initialize filter constants and sequences
+  // start with highest frequency, to avoid exceeding the maximum
+  // frequency, due to numerical errors
+  for (int i = 0; i < NUMBER_OF_BINS; i++) {
+    // calculate the bin frequency
+    float factor = pow(q, i);
+    float bin_frequency = ((float) MAX_FREQ) / factor;
+    float normalized_bin_frequency = TWO_PI * bin_frequency / SAMPLE_FREQ;
+
+    // TODO calculate the number of samples to match the constant Q
+    uint16_t number_of_samples = 100;
+
+    // call constructor
+    goertzel_init(filters[NUMBER_OF_BINS - i], normalized_bin_frequency,
+                  number_of_samples);
+  }
+}
 
 void setup() {
   // Serial connection for debugging output
@@ -18,6 +49,9 @@ void setup() {
 
   // init timer for data acquisition
   init_timer();
+
+  // init goertzel filters
+  init_filters();
 }
 
 void loop() {
@@ -34,7 +68,9 @@ void loop() {
   }
 }
 
-inline void acquire_sample() {}
+inline void acquire_sample() {
+  float sample = analogRead(A0);
+}
 
 void update_matrix() {}
 
