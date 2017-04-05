@@ -185,6 +185,10 @@ void test_div() {
 }
 
 void test_fixed_point() {
+  // pick up noise
+  randomSeed(analogRead(A1));
+
+  // start tests
   Serial.println("test_fixed_point(): Starting tests");
   test_conversion();
   test_add();
