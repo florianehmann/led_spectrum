@@ -15,6 +15,9 @@
 
 #include "Arduino.h"
 
+// switch for fixed point tests
+//#define FIXED_TEST
+
 // type to contain fixed point numbers
 typedef int32_t fixed_t;
 
@@ -40,5 +43,10 @@ inline fixed_t fixed_mul(fixed_t, fixed_t);
 
 // divides the first argument by the second
 inline fixed_t fixed_div(fixed_t, fixed_t);
+
+// test functions
+#ifdef FIXED_TEST
+void test_fixed_point();
+#endif
 
 #endif

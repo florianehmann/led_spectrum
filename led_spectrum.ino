@@ -12,6 +12,7 @@
 
 #include "led_spectrum.h"
 #include "goertzel.h"
+#include "fixedpoint.h"
 
 // array of pointers to the filters
 goertzel_t *filters[NUMBER_OF_BINS];
@@ -52,6 +53,12 @@ void init_filters() {
 void setup() {
   // Serial connection for debugging output
   Serial.begin(115200);
+
+  // tests
+  #ifdef FIXED_TEST
+  test_fixed_point();
+  while(true) {}
+  #endif
 
   // init goertzel filters
   alloc_filters();
