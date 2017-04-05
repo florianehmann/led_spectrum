@@ -12,6 +12,15 @@
 
 #include "fixedpoint.h"
 
+inline fixed_t fixed_from_float(float f) {
+  return (fixed_t) f * fixed_point_scale;
+}
+
+inline float fixed_to_float(fixed_t f) {
+  float fl = f;
+  return fl / fixed_point_scale;
+}
+
 inline fixed_t fixed_add(fixed_t a, fixed_t b) {
   return a + b;
 }

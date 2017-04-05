@@ -21,7 +21,13 @@ typedef int32_t fixed_t;
 // scale to multiply a float with in order to get a fixed point number
 // enob is 15 for each number with an entropy of ~11,1
 // can hold 4 decimal digits exactly and 5 with numerical errors
-const int32_t fixed_point_scale = 0x00010000;
+const int32_t fixed_point_scale = 0x00001000;
+
+// converts a float between -1 and 1 to a fixed point number
+inline fixed_t fixed_from_float(float);
+
+// converts a fixed point number to a float between -1 and 1
+inline float fixed_to_float(fixed_t);
 
 // returns the sum of the two arguments
 inline fixed_t fixed_add(fixed_t, fixed_t);
