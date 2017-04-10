@@ -14,16 +14,17 @@
 #define _GOERTZEL__H_
 
 #include "Arduino.h"
+#include "fixedpoint.h"
 
 typedef struct {
   // constants
-  float cosomega;
-  float sinomega;
-  float two_cosomega;
+  fixed_t cosomega;
+  fixed_t sinomega;
+  fixed_t two_cosomega;
   // intermediate sequence
-  float s_n;
-  float s_n_minus_1;
-  float s_n_minus_2;
+  fixed_t s_n;
+  fixed_t s_n_minus_1;
+  fixed_t s_n_minus_2;
   // status variables
   uint16_t processed_samples;
   uint16_t max_samples;
@@ -35,7 +36,7 @@ typedef struct {
 void goertzel_init(goertzel_t *filter, float omega, uint16_t max_samples);
 
 // feed a sample to the filer
-void goertzel_feed_sample(goertzel_t *filter, float sample);
+void goertzel_feed_sample(goertzel_t *filter, fixed_t sample);
 
 // return magnitude
 float goertzel_get_magnitude(goertzel_t *filter);

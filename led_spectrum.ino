@@ -41,7 +41,7 @@ void init_filters() {
     float normalized_bin_frequency = TWO_PI * bin_frequency / SAMPLE_FREQ;
 
     // TODO calculate the number of samples to match the constant Q
-    uint16_t number_of_samples = 50;
+    uint16_t number_of_samples = 10;
 
     // call constructor
     goertzel_init(filters[NUMBER_OF_BINS - i - 1], normalized_bin_frequency,
@@ -53,11 +53,20 @@ void setup() {
   // Serial connection for debugging output
   Serial.begin(115200);
 
+  // tests
+  #ifdef FIXED_TEST
+  test_fixed_point();
+  while(true) {}
+  #endif
+
   // init goertzel filters
+  Serial.println("setup(): Allocating filters");
   alloc_filters();
+  Serial.println("setup(): Initializing filters");
   init_filters();
 
   // init timer for data acquisition
+  Serial.println("setup(): Initializing timer");
   init_timer();
 }
 
@@ -76,11 +85,13 @@ void loop() {
   }
 }
 
-inline float acquire_sample() {
-  return analogRead(A0);
+inline int acquire_sample() {
+  static long time = 0;
+  time += SAMPLE_SPACING;
+  return sin(TWO_PI*500*time/1e6)*512;
 }
 
-inline void feed_filters(float sample) {
+inline void feed_filters(int sample) {
   // iterate over filters
   for (int i = 0; i < NUMBER_OF_BINS; i++) {
     goertzel_feed_sample(filters[i], sample);
@@ -105,13 +116,14 @@ void init_timer() {
   TCCR2A |= (1 << WGM21);
 
   // prescaling to 1/32 of system clock
+  TCCR2B &= ~(1 << CS22);
   TCCR2B |= (1 << CS21) | (1 << CS20);
 
   // enable output compare interrupt A
   TIMSK2 |= (1 << OCIE2A);
 
   // set TOP of counter according to sample rate
-  OCR2A = (uint8_t) SAMPLE_SPACING / 8.0 / 16;
+  OCR2A = (uint8_t) SAMPLE_SPACING / 32.0 * 16;
 }
 
 // timer interrupt service routine
@@ -121,7 +133,7 @@ ISR(TIMER2_COMPA_vect) {
   cli();
 
   // acquire sample data from adc
-  float sample = acquire_sample();
+  int sample = acquire_sample();
 
   // process sample
   feed_filters(sample);
