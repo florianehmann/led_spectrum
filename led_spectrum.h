@@ -43,10 +43,10 @@ void init_filters();
 
 // acquire a sample from the adc
 // do this inline, to save time on stack operations
-inline float acquire_sample();
+inline int acquire_sample();
 
 // feed acquired sample to the filters
-inline void feed_filters();
+inline void feed_filters(int);
 
 // check if the filters have received their respective amount of data
 inline bool check_filters();

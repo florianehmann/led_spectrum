@@ -12,34 +12,9 @@
 
 #include "fixedpoint.h"
 
-inline fixed_t fixed_from_float(float f) {
-  return (fixed_t) (f * fixed_point_scale);
-}
-
-inline float fixed_to_float(fixed_t f) {
-  float fl = f;
-  return fl / fixed_point_scale;
-}
-
-inline fixed_t fixed_add(fixed_t a, fixed_t b) {
-  return a + b;
-}
-
-inline fixed_t fixed_sub(fixed_t a, fixed_t b) {
-  return a - b;
-}
-
-inline fixed_t fixed_mul(fixed_t a, fixed_t b) {
-  return (a * b) / fixed_point_scale;
-}
-
-inline fixed_t fixed_div(fixed_t a, fixed_t b) {
-  return (a * fixed_point_scale) / b;
-}
-
 #ifdef FIXED_TEST
 
-const float diff = 0.001;
+const float diff = 0.000001;
 
 float random_float() {
   long scale = 500000L;
@@ -64,7 +39,7 @@ void test_conversion() {
       Serial.print(" to ");
       Serial.print(reconverted_float, 4);
       Serial.print(" via ");
-      Serial.print(test_converted, 4);
+      Serial.print((long) test_converted, 4);
       Serial.print("\n");
     }
   }
