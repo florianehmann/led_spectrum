@@ -14,7 +14,7 @@
 
 #ifdef FIXED_TEST
 
-const float diff = 0.000001;
+const float diff = 0.001;
 
 float random_float() {
   long scale = 500000L;

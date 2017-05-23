@@ -11,6 +11,7 @@
 */
 
 #include "led_spectrum.h"
+#include "fixedpoint.h"
 
 void setup() {
   // Serial connection for debugging output

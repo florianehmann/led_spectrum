@@ -18,7 +18,7 @@
 // desired maximum frequency in the spectrum in Hz
 // the current prescaling of the counter does only allow
 // values between 20 kHz and 1954 Hz
-const unsigned int MAX_FREQ = 10000;
+const unsigned int MAX_FREQ = 20000;
 
 // desired minimum frequency in the spectrum in Hz
 const unsigned int MIN_FREQ = 20;
