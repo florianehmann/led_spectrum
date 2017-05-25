@@ -11,43 +11,8 @@
 */
 
 #include "led_spectrum.h"
-#include "goertzel.h"
-
-// array of pointers to the filters
-goertzel_t *filters[NUMBER_OF_BINS];
-
-// filters are done
-bool filters_done = false;
-
-void alloc_filters() {
-  // allocate memory for filters
-  for (int i = 0; i < NUMBER_OF_BINS; i++) {
-    filters[i] = (goertzel_t *) malloc(sizeof(goertzel_t));
-  }
-}
-
-void init_filters() {
-  // calculate the factor q between two frequency bins in the relation
-  // f_n = f_(n-1) * q, when n is the number of the bin
-  float q = pow(((float) MAX_FREQ) / MIN_FREQ, 1.0 / (NUMBER_OF_BINS - 1));
-
-  // initialize filter constants and sequences
-  // start with highest frequency, to avoid exceeding the maximum
-  // frequency, due to numerical errors
-  for (int i = 0; i < NUMBER_OF_BINS; i++) {
-    // calculate the bin frequency
-    float factor = pow(q, i);
-    float bin_frequency = ((float) MAX_FREQ) / factor;
-    float normalized_bin_frequency = TWO_PI * bin_frequency / SAMPLE_FREQ;
-
-    // TODO calculate the number of samples to match the constant Q
-    uint16_t number_of_samples = 10;
-
-    // call constructor
-    goertzel_init(filters[NUMBER_OF_BINS - i - 1], normalized_bin_frequency,
-                  number_of_samples);
-  }
-}
+#include "fixedpoint.h"
+#include "fft.h"
 
 void setup() {
   // Serial connection for debugging output
@@ -59,11 +24,10 @@ void setup() {
   while(true) {}
   #endif
 
-  // init goertzel filters
-  Serial.println("setup(): Allocating filters");
-  alloc_filters();
-  Serial.println("setup(): Initializing filters");
-  init_filters();
+  #ifdef FFT_TEST
+  test_fft();
+  while(true) {}
+  #endif
 
   // init timer for data acquisition
   Serial.println("setup(): Initializing timer");
@@ -71,42 +35,12 @@ void setup() {
 }
 
 void loop() {
-  // do something, when filters are done
-  if (filters_done) {
-    // output spectrum
-    for (int i = 0; i < NUMBER_OF_BINS; i++) {
-      Serial.println(goertzel_get_magnitude(filters[i]));
-    }
-
-    // request new samples
-    init_filters();
-    filters_done = false;
-    enable_timer();
-  }
 }
 
 inline int acquire_sample() {
   static long time = 0;
   time += SAMPLE_SPACING;
   return sin(TWO_PI*500*time/1e6)*512;
-}
-
-inline void feed_filters(int sample) {
-  // iterate over filters
-  for (int i = 0; i < NUMBER_OF_BINS; i++) {
-    goertzel_feed_sample(filters[i], sample);
-  }
-}
-
-inline bool check_filters() {
-  // iterate over filters, if one is not done, more samples are needed
-  bool filters_done = true;
-  for (int i = 0; i < NUMBER_OF_BINS; i++) {
-    if (filters[i]->processed_samples < filters[i]->max_samples)
-      filters_done = false;
-  }
-
-  return filters_done;
 }
 
 void update_matrix() {}
@@ -132,17 +66,12 @@ ISR(TIMER2_COMPA_vect) {
   uint8_t old_SREG = SREG;
   cli();
 
+  // check if enough samples and disable timer is so
+
   // acquire sample data from adc
-  int sample = acquire_sample();
+  acquire_sample();
 
-  // process sample
-  feed_filters(sample);
-
-  // check if filters are done
-  filters_done = check_filters();
-  if (filters_done) {
-    disable_timer();
-  }
+  // store sample
 
   // restore status register
   SREG = old_SREG;

@@ -19,10 +19,13 @@
 //#define FIXED_TEST
 
 // type to contain fixed point numbers
-typedef int32_t fixed_t;
+typedef int16_t fixed_t;
 
 // scale to multiply a float with in order to get a fixed point number
-const int32_t fixed_point_scale = (1L<<5);
+const int16_t fixed_point_scale = (1L << 8);
+
+// two times the capacity of the fixed_t for multiplication
+typedef int32_t double_fixed_t;
 
 // converts a float between -2 and 2 to a fixed point number
 inline fixed_t fixed_from_float(float);
@@ -60,11 +63,15 @@ inline fixed_t fixed_sub(fixed_t a, fixed_t b) {
 }
 
 inline fixed_t fixed_mul(fixed_t a, fixed_t b) {
-  return (a * b) / fixed_point_scale;
+  double_fixed_t result = a;
+  result = (result * b) / fixed_point_scale;
+  return (fixed_t) result;
 }
 
 inline fixed_t fixed_div(fixed_t a, fixed_t b) {
-  return (a * fixed_point_scale) / b;
+  double_fixed_t result = a;
+  result = (result * fixed_point_scale) / b;
+  return (fixed_t) result;
 }
 
 // test functions
