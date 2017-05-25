@@ -106,9 +106,49 @@ void fft(fixed_t *x_real, fixed_t *x_imag, int len) {
   }
 }
 
+float abscoeff(fixed_t re, fixed_t im) {
+  float ref = fixed_to_float(re);
+  float imf = fixed_to_float(im);
+  return sqrt(pow(ref, 2) + pow(imf, 2));
+}
+
 #ifdef FFT_TEST
+
+fixed_t sine(float t, float frequency) {
+  float value = sin(TWO_PI * frequency * t) + 0.5 * sin(TWO_PI * frequency/2 * t);
+  return fixed_from_float(value);
+}
+
 void test_fft() {
   Serial.println("test_fft(): Starting FFT Tests");
-  Serial.println("test_fft(): Finished FFT Tests");
+  
+  // test with simple sines
+
+  // constants and fields
+  const int number_of_samples = 256;
+  fixed_t *data_re = (fixed_t*) calloc(number_of_samples, sizeof(fixed_t));
+  fixed_t *data_im = (fixed_t*) calloc(number_of_samples, sizeof(fixed_t));
+  float sig_freq = 10;
+  float max_freq = 20;
+  float sample_freq = 2 * max_freq;
+  float sample_spacing = 1 / sample_freq;
+  float t = 0.0;
+
+  // generate test data
+  for (int i = 0; i < number_of_samples; i++) {
+    data_re[i] = sine(t, sig_freq);
+    t += sample_spacing;
+  }
+
+  // perform transformation
+  fft(data_re, data_im, number_of_samples);
+
+  // output results
+  for (int i = 0; i < number_of_samples / 2; i++) {
+    Serial.println(abscoeff(data_re[i], data_im[i]) / number_of_samples * 2);
+  }
+  
+  Serial.println("test_fft(): Finished FFT Tests (should be verified with Serial Plotter)");
 }
+
 #endif

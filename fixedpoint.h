@@ -22,7 +22,7 @@
 typedef int16_t fixed_t;
 
 // scale to multiply a float with in order to get a fixed point number
-const int16_t fixed_point_scale = (1L << 14);
+const int16_t fixed_point_scale = (1L << 8);
 
 // two times the capacity of the fixed_t for multiplication
 typedef int32_t double_fixed_t;
