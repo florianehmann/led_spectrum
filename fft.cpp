@@ -105,3 +105,10 @@ void fft(fixed_t *x_real, fixed_t *x_imag, int len) {
     }
   }
 }
+
+#ifdef FFT_TEST
+void test_fft() {
+  Serial.println("test_fft(): Starting FFT Tests");
+  Serial.println("test_fft(): Finished FFT Tests");
+}
+#endif

@@ -12,6 +12,7 @@
 
 #include "led_spectrum.h"
 #include "fixedpoint.h"
+#include "fft.h"
 
 void setup() {
   // Serial connection for debugging output
@@ -20,6 +21,11 @@ void setup() {
   // tests
   #ifdef FIXED_TEST
   test_fixed_point();
+  while(true) {}
+  #endif
+
+  #ifdef FFT_TEST
+  test_fft();
   while(true) {}
   #endif
 
@@ -63,7 +69,7 @@ ISR(TIMER2_COMPA_vect) {
   // check if enough samples and disable timer is so
 
   // acquire sample data from adc
-  int sample = acquire_sample();
+  acquire_sample();
 
   // store sample
 

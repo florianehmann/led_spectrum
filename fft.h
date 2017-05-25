@@ -10,11 +10,14 @@
   Copyright (c) 2017 Florian Ehmann
 */
 
+#ifndef _FFT__H_
+#define _FFT__H_
+
 #include "Arduino.h"
 #include "fixedpoint.h"
 
 // switch for fft tests
-//#define FFT_TEST
+#define FFT_TEST
 
 // finds highest non-zero bit
 int log2radix2(int n);
@@ -27,3 +30,9 @@ void reverse_array(fixed_t *x, int len, int highest_bit);
 
 // inplace radix-2 cooley-tukey fft
 void fft(fixed_t *x_real, fixed_t *x_imag, int len);
+
+#ifdef FFT_TEST
+extern void test_fft();
+#endif
+
+#endif
