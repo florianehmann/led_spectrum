@@ -121,7 +121,7 @@ fixed_t sine(float t, float frequency) {
 
 void test_fft() {
   Serial.println("test_fft(): Starting FFT Tests");
-  
+
   // test with simple sines
 
   // constants and fields
@@ -147,7 +147,7 @@ void test_fft() {
   for (int i = 0; i < number_of_samples / 2; i++) {
     Serial.println(abscoeff(data_re[i], data_im[i]) / number_of_samples * 2);
   }
-  
+
   Serial.println("test_fft(): Finished FFT Tests (should be verified with Serial Plotter)");
 }
 
