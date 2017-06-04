@@ -13,6 +13,7 @@
 #include "led_spectrum.h"
 #include "fixedpoint.h"
 #include "fft.h"
+#include "matrix.h"
 
 void setup() {
   // Serial connection for debugging output
