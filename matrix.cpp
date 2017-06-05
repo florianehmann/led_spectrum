@@ -12,8 +12,21 @@
 
 #include "matrix.h"
 
-LedControl matrix = LedControl(DATA_IN, CLK, CS, 4);
+LedControl matrix = LedControl(DATA_IN, CLK, CS, 1);
 
 void init_matrix() {
+  // set brightness
+  matrix.setIntensity(0, 1);
 
+  // wake up MAX7219
+  matrix.shutdown(0, false);
 }
+
+#ifdef MATRIX_TEST
+
+
+void test_matrix() {
+  Serial.println("test_matrix(): Testing LED Matrix...");
+}
+
+#endif

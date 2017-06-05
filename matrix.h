@@ -17,6 +17,9 @@
 
 // Library for LED Matrix Control
 // https://github.com/wayoda/LedControl/releases
+
+// switch for fft tests
+#define MATRIX_TEST
 #include "LedControl.h"
 
 // pins for the matrix
@@ -27,5 +30,11 @@
 extern LedControl matrix;
 
 void init_matrix();
+
+#ifdef MATRIX_TEST
+
+void test_matrix();
+
+#endif
 
 #endif

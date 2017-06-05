@@ -33,6 +33,15 @@ void setup() {
   // init timer for data acquisition
   Serial.println("setup(): Initializing timer");
   init_timer();
+
+  // init LED matrix
+  Serial.println("setup(): Initializing LED Matrix");
+  init_matrix();
+
+  // matrix test after initialization
+  #ifdef MATRIX_TEST
+  test_matrix();
+  #endif
 }
 
 void loop() {
