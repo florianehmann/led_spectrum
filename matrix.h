@@ -20,7 +20,7 @@
 #include "LedControl.h"
 
 // switch for fft tests
-#define MATRIX_TEST
+//#define MATRIX_TEST
 
 // pins for the matrix
 #define DATA_IN 4
@@ -29,11 +29,19 @@
 
 extern LedControl matrix;
 
+// initializes the matrix controller
 void init_matrix();
+
+// updates the matrix according to the bar data array
+void update_bars();
 
 #ifdef MATRIX_TEST
 
 void test_matrix();
+
+void simple_matrix_test();
+
+void test_matrix_bars();
 
 #endif
 

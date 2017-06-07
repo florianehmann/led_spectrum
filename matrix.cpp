@@ -11,6 +11,7 @@
 */
 
 #include "matrix.h"
+#include "led_spectrum.h"
 
 // set number of controllers to 4, because test module has 4 matrices
 LedControl matrix = LedControl(DATA_IN, CLK, CS, 4);
@@ -23,11 +24,29 @@ void init_matrix() {
   matrix.shutdown(0, false);
 }
 
+void update_bars() {
+  // go through the bars
+  for (uint8_t bar = 0; bar < NUMBER_OF_BINS; bar++) {
+    // form full bar with bitflags
+    uint16_t full_bar = 0x00ff;
+    byte column = (full_bar << bar_data[bar]) >> 8;
+
+    matrix.setColumn(0, bar, column);
+  }
+}
+
 #ifdef MATRIX_TEST
 
 void test_matrix() {
   Serial.println("test_matrix(): Testing LED Matrix...");
 
+  //simple_matrix_test();
+
+  test_matrix_bars();
+}
+
+
+void simples_matrix_test() {
   // coordinates of the led to show
   static int x, y = 0;
 
@@ -57,6 +76,16 @@ void test_matrix() {
       }
     }
   }
+}
+
+void test_matrix_bars() {
+  // generate sample data for bar array
+  for (int i = 1; i < 9; i++) {
+    bar_data[i - 1] = i;
+  }
+
+  // display bars
+  update_bars();
 }
 
 #endif
