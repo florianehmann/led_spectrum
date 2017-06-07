@@ -13,6 +13,10 @@
 #include "led_spectrum.h"
 #include "fixedpoint.h"
 #include "fft.h"
+#include "matrix.h"
+
+// bar data array for the led matrix
+uint8_t bar_data[NUMBER_OF_BINS];
 
 void setup() {
   // Serial connection for debugging output
@@ -32,6 +36,15 @@ void setup() {
   // init timer for data acquisition
   Serial.println("setup(): Initializing timer");
   init_timer();
+
+  // init LED matrix
+  Serial.println("setup(): Initializing LED Matrix");
+  init_matrix();
+
+  // matrix test after initialization
+  #ifdef MATRIX_TEST
+  test_matrix();
+  #endif
 }
 
 void loop() {
@@ -43,7 +56,10 @@ inline int acquire_sample() {
   return sin(TWO_PI*500*time/1e6)*512;
 }
 
-void update_matrix() {}
+void update_matrix() {
+  // update bar data in the matrix
+  update_bars();
+}
 
 void init_timer() {
   // Timer/Counter 2 in CTC mode

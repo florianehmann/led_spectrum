@@ -38,6 +38,9 @@ const unsigned int SAMPLE_FREQ = 2 * MAX_FREQ;
 // distance of two samples in the time domain in us
 const unsigned int SAMPLE_SPACING = (unsigned int) (1000000l / SAMPLE_FREQ);
 
+// bar data for the led matrix
+extern uint8_t bar_data[NUMBER_OF_BINS];
+
 // acquire a sample from the adc or simulation
 // do this inline, to save time on stack operations
 inline int acquire_sample();
