@@ -31,6 +31,7 @@ uint16_t acquire_sample() {
   // read from the bus
   digitalWrite(ADC_CS, LOW);
   uint16_t data = SPI.transfer16(0xFF00);
+  digitalWrite(ADC_CS, HIGH);
 
   // clean received data
   data = 0x03FF & (data >> 3);
