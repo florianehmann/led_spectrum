@@ -16,6 +16,15 @@
 #include "matrix.h"
 #include "adc.h"
 
+// sampled audio data
+volatile uint16_t *audio_data;
+
+// number of samples in audio_data array
+volatile uint16_t acquired_samples;
+
+// flag for complete capture
+volatile bool capture_complete;
+
 // bar data array for the led matrix
 uint8_t bar_data[NUMBER_OF_BINS];
 
@@ -33,6 +42,11 @@ void setup() {
   test_fft();
   while(true) {}
   #endif
+
+  // init array for sampled audio data
+  audio_data = new uint16_t[NUMBER_OF_SAMPLES];
+  acquired_samples = 0;
+  capture_complete = false;
 
   // init timer for data acquisition
   Serial.println("setup(): Initializing Timer");
@@ -60,6 +74,32 @@ void setup() {
 }
 
 void loop() {
+  if (capture_complete) {
+    // convert data to fixed float
+    fixed_t *audio_re = new fixed_t[NUMBER_OF_SAMPLES];
+    for (uint16_t i = 0; i < NUMBER_OF_SAMPLES; i++) {
+      // convert to fixed point
+      audio_re[i] = audio_data[i]; // no scaling because it's already over 1<<8
+    }
+
+    // generate imaginary array
+    delete audio_data; // free some heap
+    fixed_t *audio_im = new fixed_t[NUMBER_OF_SAMPLES];
+
+    // fourier transform
+    fft(audio_re, audio_im, NUMBER_OF_SAMPLES);
+
+    // output spectrum
+    for (uint16_t i = 0; i < NUMBER_OF_SAMPLES/2; i++) {
+      Serial.println(abscoeff(audio_re[i], audio_im[i]));
+    }
+
+    // get ready for next capture round
+    delete audio_re;
+    delete audio_im;
+    audio_data = new uint16_t[NUMBER_OF_SAMPLES];
+    enable_timer();
+  }
 }
 
 inline int simulate_sample() {
@@ -97,9 +137,17 @@ ISR(TIMER2_COMPA_vect) {
   // check if enough samples and disable timer is so
 
   // acquire sample data from adc
-  simulate_sample();
+  //simulate_sample();
+  uint16_t sample = acquire_sample();
 
   // store sample
+  if (acquired_samples < NUMBER_OF_SAMPLES) {
+    audio_data[acquired_samples] = sample;
+    acquired_samples++;
+  } else {
+    disable_timer();
+    acquired_samples = 0;
+  }
 
   // restore status register
   SREG = old_SREG;
@@ -108,10 +156,12 @@ ISR(TIMER2_COMPA_vect) {
 void disable_timer() {
   // disable output compare interrupt A
   TIMSK2 &= ~(1 << OCIE2A);
+  capture_complete = true;
 }
 
 void enable_timer() {
   // enable output compare interrupt A
   TIMSK2 |= (1 << OCIE2A);
+  capture_complete = false;
 }
 

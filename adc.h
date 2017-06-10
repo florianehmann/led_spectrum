@@ -20,7 +20,7 @@
 #define _ADC__H_
 
 // switch for adc tests
-#define ADC_TEST
+//#define ADC_TEST
 
 // initialize adc
 void init_adc();
