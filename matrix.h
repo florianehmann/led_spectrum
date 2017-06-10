@@ -22,11 +22,6 @@
 // switch for fft tests
 //#define MATRIX_TEST
 
-// pins for the matrix
-#define DATA_IN 4
-#define CLK     5
-#define CS      6
-
 extern LedControl matrix;
 
 // initializes the matrix controller

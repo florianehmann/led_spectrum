@@ -14,6 +14,7 @@
 #include "fixedpoint.h"
 #include "fft.h"
 #include "matrix.h"
+#include "adc.h"
 
 // bar data array for the led matrix
 uint8_t bar_data[NUMBER_OF_BINS];
@@ -34,8 +35,12 @@ void setup() {
   #endif
 
   // init timer for data acquisition
-  Serial.println("setup(): Initializing timer");
+  Serial.println("setup(): Initializing Timer");
   init_timer();
+
+  // init adc
+  Serial.println("setup(): Initializing ADC");
+  init_adc();
 
   // init LED matrix
   Serial.println("setup(): Initializing LED Matrix");
@@ -45,12 +50,19 @@ void setup() {
   #ifdef MATRIX_TEST
   test_matrix();
   #endif
+
+  // adc test after initialization
+  #ifdef ADC_TEST
+  test_adc();
+  #endif
+
+  Serial.println("setup(): Setup complete");
 }
 
 void loop() {
 }
 
-inline int acquire_sample() {
+inline int simulate_sample() {
   static long time = 0;
   time += SAMPLE_SPACING;
   return sin(TWO_PI*500*time/1e6)*512;
@@ -85,7 +97,7 @@ ISR(TIMER2_COMPA_vect) {
   // check if enough samples and disable timer is so
 
   // acquire sample data from adc
-  acquire_sample();
+  simulate_sample();
 
   // store sample
 

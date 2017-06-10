@@ -15,6 +15,14 @@
 
 #include "Arduino.h"
 
+// pins for the matrix
+#define DATA_IN 4
+#define CLK     5
+#define CS      6
+
+// pins for the adc
+#define ADC_CS  7
+
 // desired maximum frequency in the spectrum in Hz
 // the current prescaling of the counter does only allow
 // values between 20 kHz and 1954 Hz
@@ -41,9 +49,9 @@ const unsigned int SAMPLE_SPACING = (unsigned int) (1000000l / SAMPLE_FREQ);
 // bar data for the led matrix
 extern uint8_t bar_data[NUMBER_OF_BINS];
 
-// acquire a sample from the adc or simulation
+// acquire a sample from simulation
 // do this inline, to save time on stack operations
-inline int acquire_sample();
+inline int simulate_sample();
 
 // perform steps necessary to update the matrix
 void update_matrix();
