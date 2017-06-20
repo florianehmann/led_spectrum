@@ -29,9 +29,11 @@ void init_adc() {
 
 uint16_t acquire_sample() {
   // read from the bus
-  digitalWrite(ADC_CS, LOW);
+  //digitalWrite(ADC_CS, LOW);
+  PORTD &= ~(1 << 7);
   uint16_t data = SPI.transfer16(0xFF00);
-  digitalWrite(ADC_CS, HIGH);
+  //digitalWrite(ADC_CS, HIGH);
+  PORTD |= (1 << 7);
 
   // clean received data
   data = 0x03FF & (data >> 3);
