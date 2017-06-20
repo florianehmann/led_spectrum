@@ -18,13 +18,16 @@ LedControl matrix = LedControl(DATA_IN, CLK, CS, 4);
 
 void init_matrix() {
   // set brightness
-  matrix.setIntensity(0, 1);
+  matrix.setIntensity(0, 0);
 
   // wake up MAX7219
   matrix.shutdown(0, false);
 }
 
 void update_bars() {
+  // clear matrix
+  matrix.clearDisplay(0);
+
   // go through the bars
   for (uint8_t bar = 0; bar < NUMBER_OF_BINS; bar++) {
     // form full bar with bitflags
