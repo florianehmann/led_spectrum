@@ -85,7 +85,7 @@ void loop() {
     for (uint16_t i = 0; i < NUMBER_OF_SAMPLES; i++) {
       // convert to fixed point
       audio_re[i] = audio_data[i]; // no scaling because it's already over 1<<8
-      //Serial.println(audio_data[i]);
+      Serial.println(audio_data[i]);
     }
 
     // generate imaginary array
@@ -149,6 +149,7 @@ void compute_bars() {
   static float cap = 100.0;
   static int cap_depth = 10;
   cap = cap / cap_depth * (cap_depth -1) + max / cap_depth;
+  cap = constrain(cap, 10.0, 1000.0);
   for (uint16_t i = 0; i < NUMBER_OF_BINS; i++) {
     sum[i] /= cap;
     bar_data[i] = constrain(round(8 * sum[i]), 0, 8);
@@ -191,7 +192,6 @@ ISR(TIMER2_COMPA_vect) {
   if (acquired_samples < NUMBER_OF_SAMPLES) {
     audio_data[acquired_samples] = sample;
     acquired_samples++;
-    Serial.println(sample);
   } else {
     disable_timer();
     acquired_samples = 0;
